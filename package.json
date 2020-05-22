@@ -1,0 +1,101 @@
+{
+	"name": "custom-view-samples",
+	"displayName": "Custom view Samples",
+	"description": "Samples for VSCode's view API",
+	"version": "0.0.1",
+	"publisher": "vscode-samples",
+	"enableProposedApi": true,
+	"engines": {
+		"vscode": "^1.42.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onView:codeLayers"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"views": {
+			"explorer": [
+				{
+					"id": "codeLayers",
+					"name": "Code Layer"
+				}
+			]
+		},
+		"commands": [
+			{
+				"command": "codeLayers.refreshEntry",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "codeLayers.addEntry",
+				"title": "Add"
+			},
+			{
+				"command": "codeLayers.editEntry",
+				"title": "Edit",
+				"icon": {
+					"light": "resources/light/edit.svg",
+					"dark": "resources/dark/edit.svg"
+				}
+			},
+			{
+				"command": "codeLayers.deleteEntry",
+				"title": "Delete"
+			}
+		],
+		"menus": {
+			"commandPalette": [],
+			"view/title": [
+				{
+					"command": "codeLayers.refreshEntry",
+					"when": "view == codeLayers",
+					"group": "navigation"
+				},
+				{
+					"command": "codeLayers.addEntry",
+					"when": "view == codeLayers"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "codeLayers.editEntry",
+					"when": "view == codeLayers && viewItem == codelayer",
+					"group": "inline"
+				},
+				{
+					"command": "codeLayers.deleteEntry",
+					"when": "view == codeLayers && viewItem == codelayer"
+				}
+			]
+		},
+		"configuration": []
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"lint": "eslint src --ext ts",
+		"watch": "tsc -watch -p ./",
+		"pretest": "npm run compile && npm run lint",
+		"test": "node ./out/test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.45.0",
+		"@types/glob": "^7.1.1",
+		"@types/mocha": "^7.0.2",
+		"@types/node": "^13.11.0",
+		"eslint": "^6.8.0",
+		"@typescript-eslint/parser": "^2.30.0",
+		"@typescript-eslint/eslint-plugin": "^2.30.0",
+		"glob": "^7.1.6",
+		"mocha": "^7.1.2",
+		"typescript": "^3.8.3",
+		"vscode-test": "^1.3.0"
+	}
+}
