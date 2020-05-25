@@ -25,57 +25,25 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		return Promise.resolve(this.getLayers());
 	}
 
-	createBaseLayerFile() {
+	createLayerFile(layerName: string) {
 		let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 		if (curFilePath === undefined) {
 			console.log("Failed to get a fsPath.");
 			return;
 		}
-		console.log("curpath", curFilePath);
 
-		const curDir = path.dirname(curFilePath);
-		console.log("curDir:", curDir);
-
-		const layerDir = path.join(curDir, ".layer");
-		console.log("layerDir:", layerDir);
-
+		const layerDir = getLayerDirPath();
 		if (!fs.existsSync(layerDir)) {
 			fs.mkdirSync(layerDir);
-			console.log("create a dir");
 		}
 
-		const layerFilePath = path.join(layerDir, "base.txt");
-
-		fs.copyFileSync(curFilePath, layerFilePath);
-	}
-
-	createNewLayerFile() {
-		let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-		if (curFilePath === undefined) {
-			console.log("Failed to get a fsPath.");
-			return;
-		}
-		console.log("curpath", curFilePath);
-
-		const curDir = path.dirname(curFilePath);
-		console.log("curDir:", curDir);
-
-		const layerDir = path.join(curDir, ".layer");
-		console.log("layerDir:", layerDir);
-
-		if (!fs.existsSync(layerDir)) {
-			fs.mkdirSync(layerDir);
-			console.log("create a dir");
-		}
-
-		const layerFilePath = path.join(layerDir, "new.txt");
-
+		const layerFilePath = getLayerFilePath(layerName);
 		fs.copyFileSync(curFilePath, layerFilePath);
 	}
 
 	addNewLayer() {
-		this.createBaseLayerFile();
-		this.createNewLayerFile();
+		this.createLayerFile("base");
+		this.createLayerFile("new");
 
 		const layer = new LayerItem("new layer", vscode.TreeItemCollapsibleState.None, {
 			command: 'extension.selectLayer',
@@ -117,6 +85,26 @@ export class LayerItem extends vscode.TreeItem {
 	contextValue = 'codelayer';
 }
 
+
+function getLayerDirPath(): string {
+	let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
+	if (curFilePath === undefined) {
+		console.log("Failed to get a fsPath.");
+		return "";
+	}
+	return path.join(path.dirname(curFilePath), ".layer");
+}
+
+function getLayerFilePath(layerName: string): string {
+	let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
+	if (curFilePath === undefined) {
+		console.log("Failed to get a fsPath.");
+		return "";
+	}
+	const layerFileName = `${path.basename(curFilePath)}.${layerName}`;
+	return path.join(getLayerDirPath(), layerFileName);
+}
+
 // let decorator: vscode.TextEditorDecorationType;
 class DecLines {
 	ranges: vscode.Range[] = [];
@@ -152,15 +140,11 @@ export function colorDiff() {
 		console.log("Failed to get a fsPath.");
 		return;
 	}
-	const curDir = path.dirname(curFilePath);
-	const layerDir = path.join(curDir, ".layer");
-
-	const baseLayerPath = path.join(layerDir, "base.txt");
-	const newLayerPath = path.join(layerDir, "new.txt");
-
+	const newLayerPath = getLayerFilePath("new");
 	fs.copyFileSync(curFilePath, newLayerPath);
 
 	// TODO: set a character encoding of a target file
+	const baseLayerPath = getLayerFilePath("base");
 	const baseLayer = fs.readFileSync(baseLayerPath, "utf-8");
 	const curFile = fs.readFileSync(curFilePath, "utf-8");
 
@@ -192,16 +176,12 @@ export function colorDiff() {
 }
 
 export function hideNewLayer() {
-	let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
+	const curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 	if (curFilePath === undefined) {
 		console.log("Failed to get a fsPath.");
 		return;
 	}
-	const curDir = path.dirname(curFilePath);
-	const layerDir = path.join(curDir, ".layer");
-
-	const baseLayerPath = path.join(layerDir, "base.txt");
-
+	const baseLayerPath = getLayerFilePath("base");
 	fs.copyFileSync(baseLayerPath, curFilePath);
 
 	if (decLines !== undefined) {
@@ -215,10 +195,8 @@ export function exposeNewLayer() {
 		console.log("Failed to get a fsPath.");
 		return;
 	}
-	const curDir = path.dirname(curFilePath);
-	const layerDir = path.join(curDir, ".layer");
-	const newLayerPath = path.join(layerDir, "new.txt");
+	const newLayerPath = getLayerFilePath("new");
 	const newLayer = fs.readFileSync(newLayerPath, "utf-8");
 	fs.writeFileSync(curFilePath, newLayer);
-	setTimeout(colorDiff, 100);
+	setTimeout(colorDiff, 200);
 }
