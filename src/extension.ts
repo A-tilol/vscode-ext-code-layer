@@ -10,8 +10,10 @@ export function activate(context: vscode.ExtensionContext) {
 	const codeLayersProvider = new LayerProvider();
 	vscode.window.registerTreeDataProvider('codeLayers', codeLayersProvider);
 
+	// refresh a layer tree view
 	vscode.commands.registerCommand('codeLayers.refreshEntry', () => codeLayersProvider.refresh());
 
+	// when a layer item on a view is selected
 	vscode.commands.registerCommand('extension.selectLayer', moduleName => {
 		hideNewLayer();
 		vscode.window.showInformationMessage(`${moduleName} is selected.`);
@@ -30,8 +32,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.commands.registerCommand('codeLayers.deleteEntry', (node: LayerItem) => vscode.window.showInformationMessage(`Successfully called delete entry on ${node.label}.`));
 
-	// And when modifying the document
+	// when modifying the document
 	vscode.workspace.onDidSaveTextDocument(() => {
 		colorDiff();
 	}, null, context.subscriptions);
+
+	vscode.window.onDidChangeActiveTextEditor(() => {
+		console.log("onDidChangeActiveTextEditor");
+		codeLayersProvider.restore();
+	});
 }

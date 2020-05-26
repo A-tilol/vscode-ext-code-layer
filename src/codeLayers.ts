@@ -28,6 +28,10 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		return Promise.resolve(this.getLayers());
 	}
 
+	private getLayers(): LayerItem[] {
+		return this.items;
+	}
+
 	createLayerFile(layerName: string) {
 		let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 		if (curFilePath === undefined) {
@@ -57,8 +61,25 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		this.refresh();
 	}
 
-	private getLayers(): LayerItem[] {
-		return this.items;
+	restore() {
+		this.items = [];
+
+		if (!fs.existsSync(getLayerFilePath(BASE_LAYER)) ||
+			!fs.existsSync(getLayerFilePath(LAYER1))) {
+			this.refresh();
+			return;
+		}
+
+		this.items.push(
+			new LayerItem("layer1", vscode.TreeItemCollapsibleState.None, {
+				command: 'extension.selectLayer',
+				title: "",
+				arguments: ["layer1 arg"]
+			})
+		);
+
+		this.refresh();
+		colorDiff();
 	}
 }
 
