@@ -9,6 +9,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// Samples of `window.registerTreeDataProvider`
 	const codeLayersProvider = new LayerProvider();
 	vscode.window.registerTreeDataProvider('codeLayers', codeLayersProvider);
+
 	vscode.commands.registerCommand('codeLayers.refreshEntry', () => codeLayersProvider.refresh());
 
 	vscode.commands.registerCommand('extension.selectLayer', moduleName => {

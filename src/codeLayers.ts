@@ -3,6 +3,9 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as Diff from 'diff';
 
+const BASE_LAYER = "baseLayer";
+const LAYER1 = "layer1";
+
 export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 
 	private items: LayerItem[] = [];
@@ -42,13 +45,13 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 	}
 
 	addNewLayer() {
-		this.createLayerFile("base");
-		this.createLayerFile("new");
+		this.createLayerFile(BASE_LAYER);
+		this.createLayerFile(LAYER1);
 
-		const layer = new LayerItem("new layer", vscode.TreeItemCollapsibleState.None, {
+		const layer = new LayerItem("layer1", vscode.TreeItemCollapsibleState.None, {
 			command: 'extension.selectLayer',
 			title: "",
-			arguments: ["new layer arg"]
+			arguments: ["layer1 arg"]
 		});
 		this.items.push(layer);
 		this.refresh();
@@ -140,11 +143,11 @@ export function colorDiff() {
 		console.log("Failed to get a fsPath.");
 		return;
 	}
-	const newLayerPath = getLayerFilePath("new");
+	const newLayerPath = getLayerFilePath(LAYER1);
 	fs.copyFileSync(curFilePath, newLayerPath);
 
 	// TODO: set a character encoding of a target file
-	const baseLayerPath = getLayerFilePath("base");
+	const baseLayerPath = getLayerFilePath(BASE_LAYER);
 	const baseLayer = fs.readFileSync(baseLayerPath, "utf-8");
 	const curFile = fs.readFileSync(curFilePath, "utf-8");
 
@@ -169,10 +172,7 @@ export function colorDiff() {
 		startLine = endLine + 1;
 	});
 
-	const editor = vscode.window.activeTextEditor;
-	if (editor === undefined) { return; }
-
-	editor.setDecorations(decLines.decorator, decLines.ranges);
+	vscode.window.activeTextEditor?.setDecorations(decLines.decorator, decLines.ranges);
 }
 
 export function hideNewLayer() {
@@ -181,7 +181,7 @@ export function hideNewLayer() {
 		console.log("Failed to get a fsPath.");
 		return;
 	}
-	const baseLayerPath = getLayerFilePath("base");
+	const baseLayerPath = getLayerFilePath(BASE_LAYER);
 	fs.copyFileSync(baseLayerPath, curFilePath);
 
 	if (decLines !== undefined) {
@@ -195,7 +195,7 @@ export function exposeNewLayer() {
 		console.log("Failed to get a fsPath.");
 		return;
 	}
-	const newLayerPath = getLayerFilePath("new");
+	const newLayerPath = getLayerFilePath(LAYER1);
 	const newLayer = fs.readFileSync(newLayerPath, "utf-8");
 	fs.writeFileSync(curFilePath, newLayer);
 	setTimeout(colorDiff, 200);
