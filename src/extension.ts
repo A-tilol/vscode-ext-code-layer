@@ -13,7 +13,9 @@ export function activate(context: vscode.ExtensionContext) {
 		codeLayersProvider.addLayer();
 	});
 
-	vscode.commands.registerCommand('codeLayers.deleteEntry', (node: LayerItem) => vscode.window.showInformationMessage(`Successfully called delete entry on ${node.label}.`));
+	vscode.commands.registerCommand('codeLayers.deleteEntry', (layer: LayerItem) => {
+		codeLayersProvider.delete();
+	});
 
 	// when a layer item on a view is selected
 	vscode.commands.registerCommand('extension.selectLayer', (layerItem: LayerItem) => {

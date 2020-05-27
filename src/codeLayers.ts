@@ -51,6 +51,32 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		this.refresh();
 	}
 
+	delete() {
+		if (decLines !== undefined) {
+			decLines.decorator.dispose();
+		}
+
+		const curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
+		if (curFilePath === undefined) {
+			console.log("Failed to get a fsPath.");
+			return;
+		}
+		let layerJson = JSON.parse(fs.readFileSync(Utils.getLayerFilePath(), "utf-8"));
+		fs.writeFileSync(curFilePath, layerJson.layer0);
+
+		if (Utils.layerExists()) {
+			fs.unlinkSync(Utils.getLayerFilePath());
+		}
+
+		const layters = fs.readdirSync(Utils.getLayerDirPath());
+		if (layters.length === 0) {
+			fs.rmdirSync(Utils.getLayerDirPath());
+		}
+
+		this.items = [];
+		this.refresh();
+	}
+
 	restore() {
 		if (!fs.existsSync(Utils.getLayerFilePath())) {
 			this.refresh();
