@@ -9,8 +9,11 @@ export function activate(context: vscode.ExtensionContext) {
 	const codeLayersProvider = new LayerProvider();
 	vscode.window.registerTreeDataProvider('codeLayers', codeLayersProvider);
 
-	// refresh a layer tree view
-	vscode.commands.registerCommand('codeLayers.refreshEntry', () => codeLayersProvider.refresh());
+	vscode.commands.registerCommand('codeLayers.addEntry', () => {
+		codeLayersProvider.addLayer();
+	});
+
+	vscode.commands.registerCommand('codeLayers.deleteEntry', (node: LayerItem) => vscode.window.showInformationMessage(`Successfully called delete entry on ${node.label}.`));
 
 	// when a layer item on a view is selected
 	vscode.commands.registerCommand('extension.selectLayer', (layerItem: LayerItem) => {
@@ -19,11 +22,8 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.showInformationMessage(`${layerItem.label} is selected.`);
 	});
 
-	vscode.commands.registerCommand('codeLayers.addEntry', () => {
-		codeLayersProvider.addLayer();
-	});
-
-	vscode.commands.registerCommand('codeLayers.deleteEntry', (node: LayerItem) => vscode.window.showInformationMessage(`Successfully called delete entry on ${node.label}.`));
+	// refresh a layer tree view
+	vscode.commands.registerCommand('codeLayers.refreshEntry', () => codeLayersProvider.refresh());
 
 	vscode.workspace.onDidSaveTextDocument(() => {
 		if (codeLayersProvider.getLayers()[0].isVisible) {

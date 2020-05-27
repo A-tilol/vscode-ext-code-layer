@@ -33,6 +33,11 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 	}
 
 	addLayer() {
+		if (Utils.layerExists()) {
+			vscode.window.showWarningMessage("Multiple layers are too much for Homo sapiens.");
+			return;
+		}
+
 		Utils.createLayerFile();
 
 		const layer = new LayerItem(LAYER1);
@@ -138,57 +143,8 @@ export class Utils {
 		return path.join(Utils.getLayerDirPath(), layerFileName);
 	}
 
-	public static colorDiff() {
-		if (decLines !== undefined) {
-			decLines.decorator.dispose();
-		}
-
-		decLines = {
-			ranges: [],
-			decorator: vscode.window.createTextEditorDecorationType({
-				'isWholeLine': true,
-				'borderWidth': '1px',
-				'borderRadius': '2px',
-				'borderStyle': 'solid',
-				'light': {
-					'backgroundColor': 'rgba(200, 220, 240, 0.1)',
-					'borderColor': 'rgba(200, 220, 240, 0.4)',
-				},
-				'dark': {
-					'backgroundColor': 'rgba(117, 141, 203, 0.1)',
-					'borderColor': 'rgba(117, 141, 203, 0.4)',
-				}
-			})
-		};
-
-		const text = vscode.window.activeTextEditor?.document.getText();
-		// TODO: set a character encoding of a target file
-		let layerJson = JSON.parse(fs.readFileSync(Utils.getLayerFilePath(), "utf-8"));
-		layerJson.layer1 = text;
-		fs.writeFileSync(Utils.getLayerFilePath(), JSON.stringify(layerJson, null, 2));
-
-		const diff = Diff.diffLines(layerJson.layer0, layerJson.layer1);
-		console.log(diff);
-		let startLine = 0;
-		diff.forEach(part => {
-			if (part.count === undefined) {
-				return;
-			}
-			if (part.removed) {
-				return;
-			}
-			if (!part.added) {
-				startLine += part.count;
-				return;
-			}
-			const endLine = startLine + part.count - 1;
-			const range = new vscode.Range(new vscode.Position(startLine, 0), new vscode.Position(endLine, 0));
-			decLines.ranges.push(range);
-
-			startLine = endLine + 1;
-		});
-
-		vscode.window.activeTextEditor?.setDecorations(decLines.decorator, decLines.ranges);
+	public static layerExists(): boolean {
+		return fs.existsSync(Utils.getLayerFilePath());
 	}
 
 	public static createLayerFile() {
@@ -246,6 +202,59 @@ export class Utils {
 		fs.writeFileSync(curFilePath, layerJson.layer1);
 
 		setTimeout(Utils.colorDiff, 200);
+	}
+
+	public static colorDiff() {
+		if (decLines !== undefined) {
+			decLines.decorator.dispose();
+		}
+
+		decLines = {
+			ranges: [],
+			decorator: vscode.window.createTextEditorDecorationType({
+				'isWholeLine': true,
+				'borderWidth': '1px',
+				'borderRadius': '2px',
+				'borderStyle': 'solid',
+				'light': {
+					'backgroundColor': 'rgba(200, 220, 240, 0.1)',
+					'borderColor': 'rgba(200, 220, 240, 0.4)',
+				},
+				'dark': {
+					'backgroundColor': 'rgba(117, 141, 203, 0.1)',
+					'borderColor': 'rgba(117, 141, 203, 0.4)',
+				}
+			})
+		};
+
+		const text = vscode.window.activeTextEditor?.document.getText();
+		// TODO: set a character encoding of a target file
+		let layerJson = JSON.parse(fs.readFileSync(Utils.getLayerFilePath(), "utf-8"));
+		layerJson.layer1 = text;
+		fs.writeFileSync(Utils.getLayerFilePath(), JSON.stringify(layerJson, null, 2));
+
+		const diff = Diff.diffLines(layerJson.layer0, layerJson.layer1);
+		console.log(diff);
+		let startLine = 0;
+		diff.forEach(part => {
+			if (part.count === undefined) {
+				return;
+			}
+			if (part.removed) {
+				return;
+			}
+			if (!part.added) {
+				startLine += part.count;
+				return;
+			}
+			const endLine = startLine + part.count - 1;
+			const range = new vscode.Range(new vscode.Position(startLine, 0), new vscode.Position(endLine, 0));
+			decLines.ranges.push(range);
+
+			startLine = endLine + 1;
+		});
+
+		vscode.window.activeTextEditor?.setDecorations(decLines.decorator, decLines.ranges);
 	}
 }
 
