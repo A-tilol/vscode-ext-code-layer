@@ -36,11 +36,6 @@
 				"icon": "$(new-file)"
 			},
 			{
-				"command": "codeLayers.editEntry",
-				"title": "Edit",
-				"icon": "$(edit)"
-			},
-			{
 				"command": "codeLayers.mergeEntry",
 				"title": "Merge"
 			},
@@ -64,11 +59,6 @@
 				}
 			],
 			"view/item/context": [
-				{
-					"command": "codeLayers.editEntry",
-					"when": "view == codeLayers && viewItem == codelayer",
-					"group": "inline"
-				},
 				{
 					"command": "codeLayers.mergeEntry",
 					"when": "view == codeLayers && viewItem == codelayer"

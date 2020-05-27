@@ -52,11 +52,12 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		this.createLayerFile(BASE_LAYER);
 		this.createLayerFile(LAYER1);
 
-		const layer = new LayerItem("layer1", vscode.TreeItemCollapsibleState.None, {
+		const layer = new LayerItem("layer1", vscode.TreeItemCollapsibleState.None);
+		layer.command = {
 			command: 'extension.selectLayer',
-			title: "",
-			arguments: ["layer1 arg"]
-		});
+			title: "selectLayerTitle",
+			arguments: [layer]
+		};
 		this.items.push(layer);
 		this.refresh();
 	}
@@ -70,17 +71,33 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 			return;
 		}
 
-		this.items.push(
-			new LayerItem("layer1", vscode.TreeItemCollapsibleState.None, {
-				command: 'extension.selectLayer',
-				title: "",
-				arguments: ["layer1 arg"]
-			})
-		);
+		const layer = new LayerItem("layer1", vscode.TreeItemCollapsibleState.None);
+		layer.command = {
+			command: 'extension.selectLayer',
+			title: "selectLayerTitle",
+			arguments: [layer]
+		};
+		this.items.push(layer);
 
 		this.refresh();
 		colorDiff();
 	}
+
+	toggleLayerVisibility() {
+		// TODO: if provide multiple layers, search for a items by a item lambel.
+		const isVisible = this.items[0].isVisible;
+		if (isVisible) {
+			hideNewLayer();
+		} else {
+			exposeNewLayer();
+		}
+
+		this.items[0].setIcon(!isVisible);
+		this.items[0].isVisible = !isVisible;
+
+		this.refresh();
+	}
+
 }
 
 export class LayerItem extends vscode.TreeItem {
@@ -89,7 +106,6 @@ export class LayerItem extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-		public readonly command?: vscode.Command,
 		public isVisible: boolean = true,
 	) {
 		super(label, collapsibleState);
@@ -105,7 +121,6 @@ export class LayerItem extends vscode.TreeItem {
 	}
 
 	setIcon(isVisible: boolean) {
-		this.isVisible = isVisible;
 		let icon = 'visibility.svg';
 		if (!isVisible) {
 			icon = 'visibility_off.svg';
@@ -204,7 +219,7 @@ export function colorDiff() {
 	vscode.window.activeTextEditor?.setDecorations(decLines.decorator, decLines.ranges);
 }
 
-export function hideNewLayer() {
+function hideNewLayer() {
 	const curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 	if (curFilePath === undefined) {
 		console.log("Failed to get a fsPath.");
@@ -218,7 +233,7 @@ export function hideNewLayer() {
 	}
 }
 
-export function exposeNewLayer() {
+function exposeNewLayer() {
 	let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 	if (curFilePath === undefined) {
 		console.log("Failed to get a fsPath.");

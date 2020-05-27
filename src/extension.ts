@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 
-import { LayerProvider, LayerItem, colorDiff, hideNewLayer, exposeNewLayer } from './codeLayers';
+import { LayerProvider, LayerItem, colorDiff } from './codeLayers';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -14,21 +14,15 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('codeLayers.refreshEntry', () => codeLayersProvider.refresh());
 
 	// when a layer item on a view is selected
-	vscode.commands.registerCommand('extension.selectLayer', moduleName => {
-		hideNewLayer();
-		vscode.window.showInformationMessage(`${moduleName} is selected.`);
+	vscode.commands.registerCommand('extension.selectLayer', (layerItem: LayerItem) => {
+		console.log(layerItem);
+		codeLayersProvider.toggleLayerVisibility();
+		vscode.window.showInformationMessage(`${layerItem.label} is selected.`);
 	});
 
 	vscode.commands.registerCommand('codeLayers.addEntry', () => {
 		codeLayersProvider.addNewLayer();
 	});
-
-
-	vscode.commands.registerCommand('codeLayers.editEntry', (node: LayerItem) => {
-		exposeNewLayer();
-		vscode.window.showInformationMessage(`enable layer ${node.label}.`);
-	});
-
 
 	vscode.commands.registerCommand('codeLayers.deleteEntry', (node: LayerItem) => vscode.window.showInformationMessage(`Successfully called delete entry on ${node.label}.`));
 
