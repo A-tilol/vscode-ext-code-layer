@@ -2,11 +2,10 @@
 
 import * as vscode from 'vscode';
 
-import { LayerProvider, LayerItem, colorDiff } from './codeLayers';
+import { LayerProvider, LayerItem, Utils } from './codeLayers';
 
 export function activate(context: vscode.ExtensionContext) {
 
-	// Samples of `window.registerTreeDataProvider`
 	const codeLayersProvider = new LayerProvider();
 	vscode.window.registerTreeDataProvider('codeLayers', codeLayersProvider);
 
@@ -21,15 +20,14 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.commands.registerCommand('codeLayers.addEntry', () => {
-		codeLayersProvider.addNewLayer();
+		codeLayersProvider.addLayer();
 	});
 
 	vscode.commands.registerCommand('codeLayers.deleteEntry', (node: LayerItem) => vscode.window.showInformationMessage(`Successfully called delete entry on ${node.label}.`));
 
-	// when modifying the document
 	vscode.workspace.onDidSaveTextDocument(() => {
 		if (codeLayersProvider.getLayers()[0].isVisible) {
-			colorDiff();
+			Utils.colorDiff();
 		}
 	}, null, context.subscriptions);
 

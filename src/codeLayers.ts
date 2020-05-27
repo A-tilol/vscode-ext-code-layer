@@ -32,31 +32,8 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		return this.items;
 	}
 
-	createLayerFile() {
-		let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-		if (curFilePath === undefined) {
-			console.log("Failed to get a fsPath.");
-			return;
-		}
-
-		const layerDir = getLayerDirPath();
-		if (!fs.existsSync(layerDir)) {
-			fs.mkdirSync(layerDir);
-		}
-
-		const text = vscode.window.activeTextEditor?.document.getText();
-		let layerJson = {
-			"layer0": text,
-			"layer1": text,
-			"isVisible": true
-		};
-
-		const layerFilePath = getLayerFilePath();
-		fs.writeFileSync(layerFilePath, JSON.stringify(layerJson, null, 2));
-	}
-
-	addNewLayer() {
-		this.createLayerFile();
+	addLayer() {
+		Utils.createLayerFile();
 
 		const layer = new LayerItem(LAYER1);
 		layer.command = {
@@ -65,16 +42,17 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 			arguments: [layer]
 		};
 		this.items.push(layer);
+
 		this.refresh();
 	}
 
 	restore() {
-		if (!fs.existsSync(getLayerFilePath())) {
+		if (!fs.existsSync(Utils.getLayerFilePath())) {
 			this.refresh();
 			return;
 		}
 
-		const layerJson = JSON.parse(fs.readFileSync(getLayerFilePath(), "utf-8"));
+		const layerJson = JSON.parse(fs.readFileSync(Utils.getLayerFilePath(), "utf-8"));
 		const layer = new LayerItem(LAYER1, layerJson.isVisible);
 		layer.command = {
 			command: 'extension.selectLayer',
@@ -86,7 +64,7 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		this.refresh();
 
 		if (layerJson.isVisible) {
-			colorDiff();
+			Utils.colorDiff();
 		}
 	}
 
@@ -94,9 +72,9 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		// TODO: if provide multiple layers, search for a items by a item lambel.
 		const isVisible = this.items[0].isVisible;
 		if (isVisible) {
-			hideNewLayer();
+			Utils.hideLayer();
 		} else {
-			exposeNewLayer();
+			Utils.exposeLayer();
 		}
 
 		this.items[0].setIcon(!isVisible);
@@ -139,116 +117,140 @@ export class LayerItem extends vscode.TreeItem {
 	}
 }
 
+export class Utils {
 
-function getLayerDirPath(): string {
-	let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-	if (curFilePath === undefined) {
-		console.log("Failed to get a fsPath.");
-		return "";
+	public static getLayerDirPath(): string {
+		let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
+		if (curFilePath === undefined) {
+			console.log("Failed to get a fsPath.");
+			return "";
+		}
+		return path.join(path.dirname(curFilePath), ".layer");
 	}
-	return path.join(path.dirname(curFilePath), ".layer");
+
+	public static getLayerFilePath(): string {
+		let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
+		if (curFilePath === undefined) {
+			console.log("Failed to get a fsPath.");
+			return "";
+		}
+		const layerFileName = `${path.basename(curFilePath)}.${LAYER_FILE_NAME}`;
+		return path.join(Utils.getLayerDirPath(), layerFileName);
+	}
+
+	public static colorDiff() {
+		if (decLines !== undefined) {
+			decLines.decorator.dispose();
+		}
+
+		decLines = {
+			ranges: [],
+			decorator: vscode.window.createTextEditorDecorationType({
+				'isWholeLine': true,
+				'borderWidth': '1px',
+				'borderRadius': '2px',
+				'borderStyle': 'solid',
+				'light': {
+					'backgroundColor': 'rgba(200, 220, 240, 0.1)',
+					'borderColor': 'rgba(200, 220, 240, 0.4)',
+				},
+				'dark': {
+					'backgroundColor': 'rgba(117, 141, 203, 0.1)',
+					'borderColor': 'rgba(117, 141, 203, 0.4)',
+				}
+			})
+		};
+
+		const text = vscode.window.activeTextEditor?.document.getText();
+		// TODO: set a character encoding of a target file
+		let layerJson = JSON.parse(fs.readFileSync(Utils.getLayerFilePath(), "utf-8"));
+		layerJson.layer1 = text;
+		fs.writeFileSync(Utils.getLayerFilePath(), JSON.stringify(layerJson, null, 2));
+
+		const diff = Diff.diffLines(layerJson.layer0, layerJson.layer1);
+		console.log(diff);
+		let startLine = 0;
+		diff.forEach(part => {
+			if (part.count === undefined) {
+				return;
+			}
+			if (part.removed) {
+				return;
+			}
+			if (!part.added) {
+				startLine += part.count;
+				return;
+			}
+			const endLine = startLine + part.count - 1;
+			const range = new vscode.Range(new vscode.Position(startLine, 0), new vscode.Position(endLine, 0));
+			decLines.ranges.push(range);
+
+			startLine = endLine + 1;
+		});
+
+		vscode.window.activeTextEditor?.setDecorations(decLines.decorator, decLines.ranges);
+	}
+
+	public static createLayerFile() {
+		let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
+		if (curFilePath === undefined) {
+			console.log("Failed to get a fsPath.");
+			return;
+		}
+
+		const layerDir = Utils.getLayerDirPath();
+		if (!fs.existsSync(layerDir)) {
+			fs.mkdirSync(layerDir);
+		}
+
+		const text = vscode.window.activeTextEditor?.document.getText();
+		let layerJson = {
+			"layer0": text,
+			"layer1": text,
+			"isVisible": true
+		};
+
+		const layerFilePath = Utils.getLayerFilePath();
+		fs.writeFileSync(layerFilePath, JSON.stringify(layerJson, null, 2));
+	}
+
+	public static hideLayer() {
+		const curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
+		if (curFilePath === undefined) {
+			console.log("Failed to get a fsPath.");
+			return;
+		}
+		let layerJson = JSON.parse(fs.readFileSync(Utils.getLayerFilePath(), "utf-8"));
+		fs.writeFileSync(curFilePath, layerJson.layer0);
+
+		layerJson.isVisible = false;
+		fs.writeFileSync(Utils.getLayerFilePath(), JSON.stringify(layerJson, null, 2));
+
+		if (decLines !== undefined) {
+			decLines.decorator.dispose();
+		}
+	}
+
+	public static exposeLayer() {
+		const text = vscode.window.activeTextEditor?.document.getText();
+		let layerJson = JSON.parse(fs.readFileSync(Utils.getLayerFilePath(), "utf-8"));
+		layerJson.layer0 = text;
+		layerJson.isVisible = true;
+		fs.writeFileSync(Utils.getLayerFilePath(), JSON.stringify(layerJson, null, 2));
+
+		const curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
+		if (curFilePath === undefined) {
+			console.log("Failed to get a fsPath.");
+			return;
+		}
+		fs.writeFileSync(curFilePath, layerJson.layer1);
+
+		setTimeout(Utils.colorDiff, 200);
+	}
 }
 
-function getLayerFilePath(): string {
-	let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-	if (curFilePath === undefined) {
-		console.log("Failed to get a fsPath.");
-		return "";
-	}
-	const layerFileName = `${path.basename(curFilePath)}.${LAYER_FILE_NAME}`;
-	return path.join(getLayerDirPath(), layerFileName);
-}
-
-// let decorator: vscode.TextEditorDecorationType;
 class DecLines {
 	ranges: vscode.Range[] = [];
 	decorator: vscode.TextEditorDecorationType = vscode.window.createTextEditorDecorationType({});
 }
 let decLines: DecLines;
-
-export function colorDiff() {
-	if (decLines !== undefined) {
-		decLines.decorator.dispose();
-	}
-
-	decLines = {
-		ranges: [],
-		decorator: vscode.window.createTextEditorDecorationType({
-			'isWholeLine': true,
-			'borderWidth': '1px',
-			'borderRadius': '2px',
-			'borderStyle': 'solid',
-			'light': {
-				'backgroundColor': 'rgba(200, 220, 240, 0.1)',
-				'borderColor': 'rgba(200, 220, 240, 0.4)',
-			},
-			'dark': {
-				'backgroundColor': 'rgba(117, 141, 203, 0.1)',
-				'borderColor': 'rgba(117, 141, 203, 0.4)',
-			}
-		})
-	};
-
-	const text = vscode.window.activeTextEditor?.document.getText();
-	// TODO: set a character encoding of a target file
-	let layerJson = JSON.parse(fs.readFileSync(getLayerFilePath(), "utf-8"));
-	layerJson.layer1 = text;
-	fs.writeFileSync(getLayerFilePath(), JSON.stringify(layerJson, null, 2));
-
-	const diff = Diff.diffLines(layerJson.layer0, layerJson.layer1);
-	console.log(diff);
-	let startLine = 0;
-	diff.forEach(part => {
-		if (part.count === undefined) {
-			return;
-		}
-		if (part.removed) {
-			return;
-		}
-		if (!part.added) {
-			startLine += part.count;
-			return;
-		}
-		const endLine = startLine + part.count - 1;
-		const range = new vscode.Range(new vscode.Position(startLine, 0), new vscode.Position(endLine, 0));
-		decLines.ranges.push(range);
-
-		startLine = endLine + 1;
-	});
-
-	vscode.window.activeTextEditor?.setDecorations(decLines.decorator, decLines.ranges);
-}
-
-function hideNewLayer() {
-	const curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-	if (curFilePath === undefined) {
-		console.log("Failed to get a fsPath.");
-		return;
-	}
-	let layerJson = JSON.parse(fs.readFileSync(getLayerFilePath(), "utf-8"));
-	fs.writeFileSync(curFilePath, layerJson.layer0);
-
-	layerJson.isVisible = false;
-	fs.writeFileSync(getLayerFilePath(), JSON.stringify(layerJson, null, 2));
-
-	if (decLines !== undefined) {
-		decLines.decorator.dispose();
-	}
-}
-
-function exposeNewLayer() {
-	const text = vscode.window.activeTextEditor?.document.getText();
-	let layerJson = JSON.parse(fs.readFileSync(getLayerFilePath(), "utf-8"));
-	layerJson.layer0 = text;
-	layerJson.isVisible = true;
-	fs.writeFileSync(getLayerFilePath(), JSON.stringify(layerJson, null, 2));
-
-	const curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-	if (curFilePath === undefined) {
-		console.log("Failed to get a fsPath.");
-		return;
-	}
-	fs.writeFileSync(curFilePath, layerJson.layer1);
-
-	setTimeout(colorDiff, 200);
-}
