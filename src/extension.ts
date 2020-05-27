@@ -28,7 +28,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// when modifying the document
 	vscode.workspace.onDidSaveTextDocument(() => {
-		colorDiff();
+		if (codeLayersProvider.getLayers()[0].isVisible) {
+			colorDiff();
+		}
 	}, null, context.subscriptions);
 
 	vscode.window.onDidChangeActiveTextEditor(() => {

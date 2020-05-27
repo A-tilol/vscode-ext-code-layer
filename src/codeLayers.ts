@@ -3,8 +3,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as Diff from 'diff';
 
-const BASE_LAYER = "baseLayer";
 const LAYER1 = "layer1";
+const LAYER_FILE_NAME = "layer";
 
 export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 
@@ -28,11 +28,11 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		return Promise.resolve(this.getLayers());
 	}
 
-	private getLayers(): LayerItem[] {
+	getLayers(): LayerItem[] {
 		return this.items;
 	}
 
-	createLayerFile(layerName: string) {
+	createLayerFile() {
 		let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 		if (curFilePath === undefined) {
 			console.log("Failed to get a fsPath.");
@@ -44,13 +44,19 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 			fs.mkdirSync(layerDir);
 		}
 
-		const layerFilePath = getLayerFilePath(layerName);
-		fs.copyFileSync(curFilePath, layerFilePath);
+		const text = vscode.window.activeTextEditor?.document.getText();
+		let layerJson = {
+			"layer0": text,
+			"layer1": text,
+			"isVisible": true
+		};
+
+		const layerFilePath = getLayerFilePath();
+		fs.writeFileSync(layerFilePath, JSON.stringify(layerJson, null, 2));
 	}
 
 	addNewLayer() {
-		this.createLayerFile(BASE_LAYER);
-		this.createLayerFile(LAYER1);
+		this.createLayerFile();
 
 		const layer = new LayerItem(LAYER1);
 		layer.command = {
@@ -63,24 +69,25 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 	}
 
 	restore() {
-		this.items = [];
-
-		if (!fs.existsSync(getLayerFilePath(BASE_LAYER)) ||
-			!fs.existsSync(getLayerFilePath(LAYER1))) {
+		if (!fs.existsSync(getLayerFilePath())) {
 			this.refresh();
 			return;
 		}
 
-		const layer = new LayerItem(LAYER1);
+		const layerJson = JSON.parse(fs.readFileSync(getLayerFilePath(), "utf-8"));
+		const layer = new LayerItem(LAYER1, layerJson.isVisible);
 		layer.command = {
 			command: 'extension.selectLayer',
 			title: "selectLayerTitle",
 			arguments: [layer]
 		};
-		this.items.push(layer);
+		this.items = [layer];
 
 		this.refresh();
-		colorDiff();
+
+		if (layerJson.isVisible) {
+			colorDiff();
+		}
 	}
 
 	toggleLayerVisibility() {
@@ -142,13 +149,13 @@ function getLayerDirPath(): string {
 	return path.join(path.dirname(curFilePath), ".layer");
 }
 
-function getLayerFilePath(layerName: string): string {
+function getLayerFilePath(): string {
 	let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 	if (curFilePath === undefined) {
 		console.log("Failed to get a fsPath.");
 		return "";
 	}
-	const layerFileName = `${path.basename(curFilePath)}.${layerName}`;
+	const layerFileName = `${path.basename(curFilePath)}.${LAYER_FILE_NAME}`;
 	return path.join(getLayerDirPath(), layerFileName);
 }
 
@@ -182,20 +189,13 @@ export function colorDiff() {
 		})
 	};
 
-	let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-	if (curFilePath === undefined) {
-		console.log("Failed to get a fsPath.");
-		return;
-	}
-	const newLayerPath = getLayerFilePath(LAYER1);
-	fs.copyFileSync(curFilePath, newLayerPath);
-
+	const text = vscode.window.activeTextEditor?.document.getText();
 	// TODO: set a character encoding of a target file
-	const baseLayerPath = getLayerFilePath(BASE_LAYER);
-	const baseLayer = fs.readFileSync(baseLayerPath, "utf-8");
-	const curFile = fs.readFileSync(curFilePath, "utf-8");
+	let layerJson = JSON.parse(fs.readFileSync(getLayerFilePath(), "utf-8"));
+	layerJson.layer1 = text;
+	fs.writeFileSync(getLayerFilePath(), JSON.stringify(layerJson, null, 2));
 
-	const diff = Diff.diffLines(baseLayer, curFile);
+	const diff = Diff.diffLines(layerJson.layer0, layerJson.layer1);
 	console.log(diff);
 	let startLine = 0;
 	diff.forEach(part => {
@@ -225,8 +225,11 @@ function hideNewLayer() {
 		console.log("Failed to get a fsPath.");
 		return;
 	}
-	const baseLayerPath = getLayerFilePath(BASE_LAYER);
-	fs.copyFileSync(baseLayerPath, curFilePath);
+	let layerJson = JSON.parse(fs.readFileSync(getLayerFilePath(), "utf-8"));
+	fs.writeFileSync(curFilePath, layerJson.layer0);
+
+	layerJson.isVisible = false;
+	fs.writeFileSync(getLayerFilePath(), JSON.stringify(layerJson, null, 2));
 
 	if (decLines !== undefined) {
 		decLines.decorator.dispose();
@@ -234,13 +237,18 @@ function hideNewLayer() {
 }
 
 function exposeNewLayer() {
-	let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
+	const text = vscode.window.activeTextEditor?.document.getText();
+	let layerJson = JSON.parse(fs.readFileSync(getLayerFilePath(), "utf-8"));
+	layerJson.layer0 = text;
+	layerJson.isVisible = true;
+	fs.writeFileSync(getLayerFilePath(), JSON.stringify(layerJson, null, 2));
+
+	const curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 	if (curFilePath === undefined) {
 		console.log("Failed to get a fsPath.");
 		return;
 	}
-	const newLayerPath = getLayerFilePath(LAYER1);
-	const newLayer = fs.readFileSync(newLayerPath, "utf-8");
-	fs.writeFileSync(curFilePath, newLayer);
+	fs.writeFileSync(curFilePath, layerJson.layer1);
+
 	setTimeout(colorDiff, 200);
 }
