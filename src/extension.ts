@@ -10,7 +10,11 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.window.registerTreeDataProvider('codeLayers', codeLayersProvider);
 
 	vscode.commands.registerCommand('codeLayers.addEntry', () => {
-		codeLayersProvider.addLayer();
+		codeLayersProvider.add();
+	});
+
+	vscode.commands.registerCommand('codeLayers.mergeEntry', () => {
+		codeLayersProvider.merge();
 	});
 
 	vscode.commands.registerCommand('codeLayers.deleteEntry', (layer: LayerItem) => {
@@ -18,10 +22,8 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	// when a layer item on a view is selected
-	vscode.commands.registerCommand('extension.selectLayer', (layerItem: LayerItem) => {
-		console.log(layerItem);
+	vscode.commands.registerCommand('extension.selectLayer', () => {
 		codeLayersProvider.toggleLayerVisibility();
-		vscode.window.showInformationMessage(`${layerItem.label} is selected.`);
 	});
 
 	// refresh a layer tree view

@@ -32,7 +32,7 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		return this.items;
 	}
 
-	addLayer() {
+	add() {
 		if (Utils.layerExists()) {
 			vscode.window.showWarningMessage("Multiple layers are too much for Homo sapiens.");
 			return;
@@ -75,6 +75,14 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 
 		this.items = [];
 		this.refresh();
+	}
+
+	merge() {
+		let layerJson = JSON.parse(fs.readFileSync(Utils.getLayerFilePath(), "utf-8"));
+		layerJson.layer0 = layerJson.layer1;
+		fs.writeFileSync(Utils.getLayerFilePath(), JSON.stringify(layerJson, null, 2));
+
+		this.delete();
 	}
 
 	restore() {
