@@ -179,11 +179,11 @@ export function colorDiff() {
 			'borderRadius': '2px',
 			'borderStyle': 'solid',
 			'light': {
-				'backgroundColor': 'rgba(58, 70, 101, 0.3)',
-				'borderColor': 'rgba(58, 70, 101, 0.4)',
+				'backgroundColor': 'rgba(200, 220, 240, 0.1)',
+				'borderColor': 'rgba(200, 220, 240, 0.4)',
 			},
 			'dark': {
-				'backgroundColor': 'rgba(117, 141, 203, 0.3)',
+				'backgroundColor': 'rgba(117, 141, 203, 0.1)',
 				'borderColor': 'rgba(117, 141, 203, 0.4)',
 			}
 		})
