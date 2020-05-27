@@ -52,7 +52,7 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		this.createLayerFile(BASE_LAYER);
 		this.createLayerFile(LAYER1);
 
-		const layer = new LayerItem("layer1", vscode.TreeItemCollapsibleState.None);
+		const layer = new LayerItem(LAYER1);
 		layer.command = {
 			command: 'extension.selectLayer',
 			title: "selectLayerTitle",
@@ -71,7 +71,7 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 			return;
 		}
 
-		const layer = new LayerItem("layer1", vscode.TreeItemCollapsibleState.None);
+		const layer = new LayerItem(LAYER1);
 		layer.command = {
 			command: 'extension.selectLayer',
 			title: "selectLayerTitle",
@@ -105,10 +105,9 @@ export class LayerItem extends vscode.TreeItem {
 
 	constructor(
 		public readonly label: string,
-		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public isVisible: boolean = true,
 	) {
-		super(label, collapsibleState);
+		super(label, vscode.TreeItemCollapsibleState.None);
 		this.setIcon(isVisible);
 	}
 
@@ -125,6 +124,7 @@ export class LayerItem extends vscode.TreeItem {
 		if (!isVisible) {
 			icon = 'visibility_off.svg';
 		}
+
 		this.iconPath = {
 			light: path.join(__filename, '..', '..', 'resources', 'light', icon),
 			dark: path.join(__filename, '..', '..', 'resources', 'dark', icon)
