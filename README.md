@@ -63,3 +63,7 @@ Added features X, Y, and Z.
 * [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
 
 **Enjoy!**
+
+This software includes the work that is distributed in the Apache License 2.0
+
+'https://github.com/google/material-design-icons'

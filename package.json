@@ -28,22 +28,21 @@
 			{
 				"command": "codeLayers.refreshEntry",
 				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
+				"icon": "$(refresh)"
 			},
 			{
 				"command": "codeLayers.addEntry",
-				"title": "Add"
+				"title": "Add",
+				"icon": "$(new-file)"
 			},
 			{
 				"command": "codeLayers.editEntry",
 				"title": "Edit",
-				"icon": {
-					"light": "resources/light/edit.svg",
-					"dark": "resources/dark/edit.svg"
-				}
+				"icon": "$(edit)"
+			},
+			{
+				"command": "codeLayers.mergeEntry",
+				"title": "Merge"
 			},
 			{
 				"command": "codeLayers.deleteEntry",
@@ -60,7 +59,8 @@
 				},
 				{
 					"command": "codeLayers.addEntry",
-					"when": "view == codeLayers"
+					"when": "view == codeLayers",
+					"group": "navigation"
 				}
 			],
 			"view/item/context": [
@@ -68,6 +68,10 @@
 					"command": "codeLayers.editEntry",
 					"when": "view == codeLayers && viewItem == codelayer",
 					"group": "inline"
+				},
+				{
+					"command": "codeLayers.mergeEntry",
+					"when": "view == codeLayers && viewItem == codelayer"
 				},
 				{
 					"command": "codeLayers.deleteEntry",

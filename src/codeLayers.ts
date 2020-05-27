@@ -84,13 +84,16 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 }
 
 export class LayerItem extends vscode.TreeItem {
+	contextValue = 'codelayer';
 
 	constructor(
 		public readonly label: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-		public readonly command?: vscode.Command
+		public readonly command?: vscode.Command,
+		public isVisible: boolean = true,
 	) {
 		super(label, collapsibleState);
+		this.setIcon(isVisible);
 	}
 
 	get tooltip(): string {
@@ -98,15 +101,20 @@ export class LayerItem extends vscode.TreeItem {
 	}
 
 	get description(): string {
-		return "description";
+		return "";
 	}
 
-	iconPath = {
-		light: path.join(__filename, '..', '..', 'resources', 'light', 'dependency.svg'),
-		dark: path.join(__filename, '..', '..', 'resources', 'dark', 'dependency.svg')
-	};
-
-	contextValue = 'codelayer';
+	setIcon(isVisible: boolean) {
+		this.isVisible = isVisible;
+		let icon = 'visibility.svg';
+		if (!isVisible) {
+			icon = 'visibility_off.svg';
+		}
+		this.iconPath = {
+			light: path.join(__filename, '..', '..', 'resources', 'light', icon),
+			dark: path.join(__filename, '..', '..', 'resources', 'dark', icon)
+		};
+	}
 }
 
 
