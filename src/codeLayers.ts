@@ -50,7 +50,7 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 
 		const layer = new LayerItem(LAYER_LABEL);
 		layer.command = {
-			command: 'extension.toggleLayerVisibility',
+			command: 'codeLayers.toggleLayerVisibility',
 			title: "Toggle a Layer Visibility",
 			arguments: [layer]
 		};
@@ -112,7 +112,7 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		const layerJson = JSON.parse(fs.readFileSync(Utils.getLayerFilePath(), "utf-8"));
 		const layer = new LayerItem(LAYER_LABEL, layerJson.isVisible);
 		layer.command = {
-			command: 'extension.toggleLayerVisibility',
+			command: 'codeLayers.toggleLayerVisibility',
 			title: "Toggle a Layer Visibility",
 			arguments: [layer]
 		};

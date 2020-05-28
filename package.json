@@ -1,7 +1,7 @@
 {
 	"name": "code-layer",
 	"displayName": "Code Layer",
-	"description": "Code Layer lets you add a layer that you can write disposable codes.",
+	"description": "Code Layer lets you add a layer that you can write a disposable or temporary code.",
 	"version": "0.0.1",
 	"publisher": "atilol",
 	"license": "MIT",
@@ -52,7 +52,7 @@
 				"category": "Layer"
 			},
 			{
-				"command": "extension.toggleLayerVisibility",
+				"command": "codeLayers.toggleLayerVisibility",
 				"title": "Toggle a Layer visibility",
 				"category": "Layer"
 			}

@@ -22,7 +22,7 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	// when a layer item on a view is selected
-	context.subscriptions.push(vscode.commands.registerCommand('extension.toggleLayerVisibility', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('codeLayers.toggleLayerVisibility', () => {
 		codeLayersProvider.toggleLayerVisibility();
 	}));
 
