@@ -27,21 +27,30 @@
 		"commands": [
 			{
 				"command": "codeLayers.refreshEntry",
-				"title": "Refresh",
+				"title": "Refresh a layer",
+				"category": "Layer",
 				"icon": "$(refresh)"
 			},
 			{
 				"command": "codeLayers.addEntry",
 				"title": "Add a layer",
+				"category": "Layer",
 				"icon": "$(new-file)"
 			},
 			{
 				"command": "codeLayers.mergeEntry",
-				"title": "Merge"
+				"title": "Merge a layer",
+				"category": "Layer"
 			},
 			{
 				"command": "codeLayers.deleteEntry",
-				"title": "Delete"
+				"title": "Delete a layer",
+				"category": "Layer"
+			},
+			{
+				"command": "extension.selectLayer",
+				"title": "Toggle a visibility",
+				"category": "Layer"
 			}
 		],
 		"menus": {
