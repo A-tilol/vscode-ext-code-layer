@@ -87,6 +87,7 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 
 	restoreLayer() {
 		if (!fs.existsSync(Utils.getLayerFilePath())) {
+			this.items = [];
 			this.refresh();
 			return;
 		}

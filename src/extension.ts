@@ -38,5 +38,5 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.window.onDidChangeActiveTextEditor(() => {
 		console.log("onDidChangeActiveTextEditor");
 		codeLayersProvider.restoreLayer();
-	});
+	}, null, context.subscriptions);
 }
