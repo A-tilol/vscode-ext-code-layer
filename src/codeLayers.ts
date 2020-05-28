@@ -18,10 +18,6 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 	constructor() {
 	}
 
-	refresh(): void {
-		this._onDidChangeTreeData.fire(undefined);
-	}
-
 	getTreeItem(element: LayerItem): vscode.TreeItem {
 		return element;
 	}
@@ -32,6 +28,16 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 
 	getLayers(): LayerItem[] {
 		return this.items;
+	}
+
+	refresh() {
+		if (this.items.length === 0) {
+			this.restoreLayer();
+		}
+	}
+
+	refreshLayerView() {
+		this._onDidChangeTreeData.fire(undefined);
 	}
 
 	addLayer() {
@@ -50,7 +56,7 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		};
 		this.items.push(layer);
 
-		this.refresh();
+		this.refreshLayerView();
 	}
 
 	deleteLayer() {
@@ -81,7 +87,7 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		}
 
 		this.items = [];
-		this.refresh();
+		this.refreshLayerView();
 	}
 
 	mergeLayer() {
@@ -100,7 +106,7 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 	restoreLayer() {
 		if (!fs.existsSync(Utils.getLayerFilePath())) {
 			this.items = [];
-			this.refresh();
+			this.refreshLayerView();
 			return;
 		}
 
@@ -113,7 +119,7 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		};
 		this.items = [layer];
 
-		this.refresh();
+		this.refreshLayerView();
 
 		if (layerJson.isVisible) {
 			Utils.colorDiff();
@@ -137,7 +143,7 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		this.items[0].setIcon(!isVisible);
 		this.items[0].isVisible = !isVisible;
 
-		this.refresh();
+		this.refreshLayerView();
 	}
 
 }

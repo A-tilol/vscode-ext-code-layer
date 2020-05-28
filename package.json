@@ -27,7 +27,7 @@
 		"commands": [
 			{
 				"command": "codeLayers.refreshLayer",
-				"title": "Refresh a layer",
+				"title": "Refresh",
 				"category": "Layer",
 				"icon": "$(refresh)"
 			},
