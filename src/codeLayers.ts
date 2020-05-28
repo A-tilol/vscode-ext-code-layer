@@ -54,6 +54,11 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 	}
 
 	deleteLayer() {
+		if (!Utils.layerExists()) {
+			vscode.window.showWarningMessage("The layer does not exist.");
+			return;
+		}
+
 		if (decLines !== undefined) {
 			decLines.decorator.dispose();
 		}
@@ -80,6 +85,11 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 	}
 
 	mergeLayer() {
+		if (!Utils.layerExists()) {
+			vscode.window.showWarningMessage("The layer does not exist.");
+			return;
+		}
+
 		let layerJson = JSON.parse(fs.readFileSync(Utils.getLayerFilePath(), "utf-8"));
 		layerJson.layer0 = layerJson.layer1;
 		fs.writeFileSync(Utils.getLayerFilePath(), JSON.stringify(layerJson, null, 2));
@@ -111,6 +121,11 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 	}
 
 	toggleLayerVisibility() {
+		if (!Utils.layerExists()) {
+			vscode.window.showWarningMessage("The layer does not exist.");
+			return;
+		}
+
 		// TODO: if provide multiple layers, search for a items by a item lambel.
 		const isVisible = this.items[0].isVisible;
 		if (isVisible) {
