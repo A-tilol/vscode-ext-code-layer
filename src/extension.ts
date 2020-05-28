@@ -10,15 +10,15 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.window.registerTreeDataProvider('codeLayers', codeLayersProvider);
 
 	vscode.commands.registerCommand('codeLayers.addEntry', () => {
-		codeLayersProvider.add();
+		codeLayersProvider.addLayer();
 	});
 
 	vscode.commands.registerCommand('codeLayers.mergeEntry', () => {
-		codeLayersProvider.merge();
+		codeLayersProvider.mergeLayer();
 	});
 
 	vscode.commands.registerCommand('codeLayers.deleteEntry', (layer: LayerItem) => {
-		codeLayersProvider.delete();
+		codeLayersProvider.deleteLayer();
 	});
 
 	// when a layer item on a view is selected
@@ -37,6 +37,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.window.onDidChangeActiveTextEditor(() => {
 		console.log("onDidChangeActiveTextEditor");
-		codeLayersProvider.restore();
+		codeLayersProvider.restoreLayer();
 	});
 }

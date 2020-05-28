@@ -32,7 +32,7 @@
 			},
 			{
 				"command": "codeLayers.addEntry",
-				"title": "Add",
+				"title": "Add a layer",
 				"icon": "$(new-file)"
 			},
 			{

@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as Diff from 'diff';
 
-const LAYER1 = "layer1";
+const LAYER_LABEL = "layer";
 const LAYER_FILE_NAME = "layer";
 
 export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
@@ -32,7 +32,7 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		return this.items;
 	}
 
-	add() {
+	addLayer() {
 		if (Utils.layerExists()) {
 			vscode.window.showWarningMessage("Multiple layers are too much for Homo sapiens.");
 			return;
@@ -40,7 +40,7 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 
 		Utils.createLayerFile();
 
-		const layer = new LayerItem(LAYER1);
+		const layer = new LayerItem(LAYER_LABEL);
 		layer.command = {
 			command: 'extension.selectLayer',
 			title: "selectLayerTitle",
@@ -51,7 +51,7 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		this.refresh();
 	}
 
-	delete() {
+	deleteLayer() {
 		if (decLines !== undefined) {
 			decLines.decorator.dispose();
 		}
@@ -77,22 +77,22 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 		this.refresh();
 	}
 
-	merge() {
+	mergeLayer() {
 		let layerJson = JSON.parse(fs.readFileSync(Utils.getLayerFilePath(), "utf-8"));
 		layerJson.layer0 = layerJson.layer1;
 		fs.writeFileSync(Utils.getLayerFilePath(), JSON.stringify(layerJson, null, 2));
 
-		this.delete();
+		this.deleteLayer();
 	}
 
-	restore() {
+	restoreLayer() {
 		if (!fs.existsSync(Utils.getLayerFilePath())) {
 			this.refresh();
 			return;
 		}
 
 		const layerJson = JSON.parse(fs.readFileSync(Utils.getLayerFilePath(), "utf-8"));
-		const layer = new LayerItem(LAYER1, layerJson.isVisible);
+		const layer = new LayerItem(LAYER_LABEL, layerJson.isVisible);
 		layer.command = {
 			command: 'extension.selectLayer',
 			title: "selectLayerTitle",
