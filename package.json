@@ -1,6 +1,6 @@
 {
-	"name": "custom-view-samples",
-	"displayName": "Custom view Samples",
+	"name": "code-layers",
+	"displayName": "Code Layers",
 	"description": "Samples for VSCode's view API",
 	"version": "0.0.1",
 	"publisher": "vscode-samples",
@@ -20,36 +20,36 @@
 			"explorer": [
 				{
 					"id": "codeLayers",
-					"name": "Code Layer"
+					"name": "Code Layers"
 				}
 			]
 		},
 		"commands": [
 			{
-				"command": "codeLayers.refreshEntry",
+				"command": "codeLayers.refreshLayer",
 				"title": "Refresh a layer",
 				"category": "Layer",
 				"icon": "$(refresh)"
 			},
 			{
-				"command": "codeLayers.addEntry",
+				"command": "codeLayers.addLayer",
 				"title": "Add a layer",
 				"category": "Layer",
 				"icon": "$(new-file)"
 			},
 			{
-				"command": "codeLayers.mergeEntry",
+				"command": "codeLayers.mergeLayer",
 				"title": "Merge a layer",
 				"category": "Layer"
 			},
 			{
-				"command": "codeLayers.deleteEntry",
+				"command": "codeLayers.deleteLayer",
 				"title": "Delete a layer",
 				"category": "Layer"
 			},
 			{
-				"command": "extension.selectLayer",
-				"title": "Toggle a visibility",
+				"command": "extension.toggleLayerVisibility",
+				"title": "Toggle a Layer visibility",
 				"category": "Layer"
 			}
 		],
@@ -57,23 +57,23 @@
 			"commandPalette": [],
 			"view/title": [
 				{
-					"command": "codeLayers.refreshEntry",
+					"command": "codeLayers.refreshLayer",
 					"when": "view == codeLayers",
 					"group": "navigation"
 				},
 				{
-					"command": "codeLayers.addEntry",
+					"command": "codeLayers.addLayer",
 					"when": "view == codeLayers",
 					"group": "navigation"
 				}
 			],
 			"view/item/context": [
 				{
-					"command": "codeLayers.mergeEntry",
+					"command": "codeLayers.mergeLayer",
 					"when": "view == codeLayers && viewItem == codelayer"
 				},
 				{
-					"command": "codeLayers.deleteEntry",
+					"command": "codeLayers.deleteLayer",
 					"when": "view == codeLayers && viewItem == codelayer"
 				}
 			]

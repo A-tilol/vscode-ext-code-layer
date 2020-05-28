@@ -9,25 +9,25 @@ export function activate(context: vscode.ExtensionContext) {
 	const codeLayersProvider = new LayerProvider();
 	vscode.window.registerTreeDataProvider('codeLayers', codeLayersProvider);
 
-	context.subscriptions.push(vscode.commands.registerCommand('codeLayers.addEntry', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('codeLayers.addLayer', () => {
 		codeLayersProvider.addLayer();
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('codeLayers.mergeEntry', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('codeLayers.mergeLayer', () => {
 		codeLayersProvider.mergeLayer();
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('codeLayers.deleteEntry', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('codeLayers.deleteLayer', () => {
 		codeLayersProvider.deleteLayer();
 	}));
 
 	// when a layer item on a view is selected
-	context.subscriptions.push(vscode.commands.registerCommand('extension.selectLayer', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('extension.toggleLayerVisibility', () => {
 		codeLayersProvider.toggleLayerVisibility();
 	}));
 
 	// refresh a layer tree view
-	context.subscriptions.push(vscode.commands.registerCommand('codeLayers.refreshEntry', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('codeLayers.refreshLayer', () => {
 		codeLayersProvider.refresh();
 	}));
 
