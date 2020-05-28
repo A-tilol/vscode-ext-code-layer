@@ -10,25 +10,35 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.window.registerTreeDataProvider('codeLayers', codeLayersProvider);
 
 	context.subscriptions.push(vscode.commands.registerCommand('codeLayers.addLayer', () => {
-		codeLayersProvider.addLayer();
+		vscode.window.activeTextEditor?.document.save().then(() => {
+			codeLayersProvider.addLayer();
+		});
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('codeLayers.mergeLayer', () => {
-		codeLayersProvider.mergeLayer();
+		vscode.window.activeTextEditor?.document.save().then(() => {
+			codeLayersProvider.mergeLayer();
+		});
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('codeLayers.deleteLayer', () => {
-		codeLayersProvider.deleteLayer();
+		vscode.window.activeTextEditor?.document.save().then(() => {
+			codeLayersProvider.deleteLayer();
+		});
 	}));
 
 	// when a layer item on a view is selected
 	context.subscriptions.push(vscode.commands.registerCommand('codeLayers.toggleLayerVisibility', () => {
-		codeLayersProvider.toggleLayerVisibility();
+		vscode.window.activeTextEditor?.document.save().then(() => {
+			codeLayersProvider.toggleLayerVisibility();
+		});
 	}));
 
 	// refresh a layer tree view
 	context.subscriptions.push(vscode.commands.registerCommand('codeLayers.refreshLayer', () => {
-		codeLayersProvider.refresh();
+		vscode.window.activeTextEditor?.document.save().then(() => {
+			codeLayersProvider.refresh();
+		});
 	}));
 
 	vscode.workspace.onDidSaveTextDocument(() => {
