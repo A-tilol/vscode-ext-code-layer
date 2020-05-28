@@ -71,7 +71,6 @@ export class LayerProvider implements vscode.TreeDataProvider<LayerItem> {
 
 		const curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 		if (curFilePath === undefined) {
-			console.log("Failed to get a fsPath.");
 			return;
 		}
 		let layerJson = JSON.parse(fs.readFileSync(Utils.getLayerFilePath(), "utf-8"));
@@ -185,7 +184,6 @@ export class Utils {
 	public static getLayerDirPath(): string {
 		let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 		if (curFilePath === undefined) {
-			console.log("Failed to get a fsPath.");
 			return "";
 		}
 		return path.join(path.dirname(curFilePath), ".layer");
@@ -194,7 +192,6 @@ export class Utils {
 	public static getLayerFilePath(): string {
 		let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 		if (curFilePath === undefined) {
-			console.log("Failed to get a fsPath.");
 			return "";
 		}
 		const layerFileName = `${path.basename(curFilePath)}.${LAYER_FILE_NAME}`;
@@ -208,7 +205,6 @@ export class Utils {
 	public static createLayerFile() {
 		let curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 		if (curFilePath === undefined) {
-			console.log("Failed to get a fsPath.");
 			return;
 		}
 
@@ -231,7 +227,6 @@ export class Utils {
 	public static hideLayer() {
 		const curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 		if (curFilePath === undefined) {
-			console.log("Failed to get a fsPath.");
 			return;
 		}
 		let layerJson = JSON.parse(fs.readFileSync(Utils.getLayerFilePath(), "utf-8"));
@@ -254,7 +249,6 @@ export class Utils {
 
 		const curFilePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 		if (curFilePath === undefined) {
-			console.log("Failed to get a fsPath.");
 			return;
 		}
 		fs.writeFileSync(curFilePath, layerJson.layer1);
@@ -292,7 +286,6 @@ export class Utils {
 		fs.writeFileSync(Utils.getLayerFilePath(), JSON.stringify(layerJson, null, 2));
 
 		const diff = Diff.diffLines(layerJson.layer0, layerJson.layer1);
-		console.log(diff);
 		let startLine = 0;
 		diff.forEach(part => {
 			if (part.count === undefined) {

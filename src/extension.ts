@@ -14,11 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('codeLayers.mergeLayer', () => {
-		try {
-			codeLayersProvider.mergeLayer();
-		} catch (e) {
-			console.log(e);
-		}
+		codeLayersProvider.mergeLayer();
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('codeLayers.deleteLayer', () => {

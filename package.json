@@ -3,8 +3,7 @@
 	"displayName": "Code Layers",
 	"description": "Samples for VSCode's view API",
 	"version": "0.0.1",
-	"publisher": "vscode-samples",
-	"enableProposedApi": true,
+	"publisher": "atilol",
 	"engines": {
 		"vscode": "^1.42.0"
 	},
@@ -20,7 +19,8 @@
 			"explorer": [
 				{
 					"id": "codeLayers",
-					"name": "Code Layers"
+					"name": "Code Layers",
+					"when": "editorIsOpen"
 				}
 			]
 		},
