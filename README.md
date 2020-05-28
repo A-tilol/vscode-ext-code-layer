@@ -18,7 +18,7 @@ Code Layer lets you add a layer that you can write a disposable or temporary cod
 
 ## Release Notes
 
-CHANGELOG.md
+[CHANGELOG.md](/CHANGELOG.md)
 
 ## Thenks
 
