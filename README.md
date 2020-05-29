@@ -2,6 +2,8 @@
 
 Code Layer lets you add a layer that you can write a disposable or temporary code.
 
+![code-layer-demo](/resources/demo.gif)
+
 ## Commands
 
 - `codeLayers.addLayer` : Add new layer
