@@ -22,7 +22,7 @@ Code Layer lets you add a layer that you can write a disposable or temporary cod
 
 [CHANGELOG.md](/CHANGELOG.md)
 
-## Thenks
+## Thanks
 
 This software includes the following work that is distributed in the Apache License 2.0
 
